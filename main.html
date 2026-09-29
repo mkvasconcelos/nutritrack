@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f7d5b">
+<meta name="description" content="Rastreador de calorias, proteína, água e peso. Use offline.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NutriTrack">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%232f7d5b' width='180' height='180'/><text x='50%' y='50%' font-size='100' font-weight='bold' text-anchor='middle' dy='.3em' fill='white'>📊</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%232f7d5b' width='180' height='180'/><text x='50%' y='50%' font-size='100' font-weight='bold' text-anchor='middle' dy='.3em' fill='white'>📊</text></svg>">
+<link rel="manifest" href="data:application/manifest+json,{'name':'NutriTrack','short_name':'NutriTrack','description':'Rastreador de saúde','start_url':'/','display':'standalone','background_color':'%23f6f7f5','theme_color':'%232f7d5b','scope':'/','icons':[{'src':'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22><rect fill=%22%232f7d5b%22 width=%22192%22 height=%22192%22/><text x=%2250%25%22 y=%2250%25%22 font-size=%22120%22 font-weight=%22bold%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22>📊</text></svg>','sizes':'192x192','type':'image/svg+xml','purpose':'any'},{'src':'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><rect fill=%22%232f7d5b%22 width=%22512%22 height=%22512%22/><text x=%2250%25%22 y=%2250%25%22 font-size=%22300%22 font-weight=%22bold%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22>📊</text></svg>','sizes':'512x512','type':'image/svg+xml','purpose':'any maskable'}]}">
+<title>NutriTrack</title>
+<style>
+:root{--bg:#f6f7f5;--card:#fff;--tx:#1d2320;--mu:#6b756f;--bd:#e2e6e3;--ac:#2f7d5b;--ok:#2f7d5b;--bad:#c2483d;--wa:#2f80c2;--prot:#d97706;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141816;--card:#1e2421;--tx:#e8ece9;--mu:#8f9a94;--bd:#2c3531;--ac:#4cb388;--ok:#4cb388;--bad:#e2685c;--wa:#5aa5e6;--prot:#f59e0b}}
+:root[data-theme="dark"]{--bg:#141816;--card:#1e2421;--tx:#e8ece9;--mu:#8f9a94;--bd:#2c3531;--ac:#4cb388;--ok:#4cb388;--bad:#e2685c;--wa:#5aa5e6;--prot:#f59e0b}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+main{max-width:560px;margin:0 auto;padding:14px 14px 120px}
+h1{font-size:20px;margin:4px 0 12px;display:flex;align-items:center;gap:8px}
+h2{font-size:14px;margin:0 0 10px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button,.seg button{flex:1;padding:9px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit;cursor:pointer;transition:all .2s;min-width:60px}
+.tabs button.on,.seg button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.tabs button:active,.seg button:active{transform:scale(.98)}
+.seg{display:flex;gap:6px;margin-bottom:12px}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.nav button{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;width:40px;height:36px;font-size:16px;cursor:pointer;transition:all .2s}
+.nav button:active{transform:scale(.95)}
+.nav b{font-size:16px;flex:1;text-align:center}
+.row{display:flex;gap:8px;margin-bottom:8px}
+input,select{flex:1;min-width:0;padding:9px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+input.k{flex:0 0 70px}
+.btn{padding:9px 14px;border:0;border-radius:10px;background:var(--ac);color:#fff;font:inherit;cursor:pointer;transition:all .2s}
+.btn:active{transform:scale(.95)}
+.btn.wa{background:var(--wa)}
+.btn.prot{background:var(--prot)}
+.btn.g{background:transparent;color:var(--mu);border:1px solid var(--bd)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.grid div{font-size:12px;color:var(--mu)}.grid b{display:block;font-size:18px;color:var(--tx);margin-top:2px}
+.macros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.macro{padding:10px;border-radius:10px;text-align:center;font-size:13px}
+.macro.cal{background:rgba(47,125,91,.1);border:1px solid var(--ok)}
+.macro.prot{background:rgba(217,119,6,.1);border:1px solid var(--prot)}
+.macro.water{background:rgba(47,128,194,.1);border:1px solid var(--wa)}
+.macro b{display:block;font-size:16px;margin:4px 0 2px;color:var(--tx)}
+.macro .label{font-size:11px;color:var(--mu)}
+.big{text-align:center;font-size:22px;font-weight:700;margin:10px 0 0}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.mu{color:var(--mu);font-size:13px}
+.it{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--bd)}
+.it span{flex:1}
+.it .val{text-align:right;font-size:14px;color:var(--tx);font-weight:500}
+.it button{border:0;background:none;color:var(--mu);cursor:pointer;font-size:16px;padding:4px 8px;margin-left:8px}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden;margin:6px 0 10px;display:flex}
+.bar i{height:100%;flex:1;background:var(--wa);border-right:2px solid var(--card)}
+.bar i:last-child{border-right:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.chips button{padding:7px 12px;border:1px solid var(--wa);color:var(--wa);background:transparent;border-radius:20px;font:inherit;cursor:pointer;transition:all .2s}
+.chips button:active{transform:scale(.95)}
+svg{width:100%;height:auto;display:block}
+label{display:block;font-size:13px;color:var(--mu);margin-bottom:4px;margin-top:8px}
+label:first-of-type{margin-top:0}
+.bottom-menu{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 0;max-width:560px;margin:0 auto;box-shadow:0 -2px 8px rgba(0,0,0,.05);z-index:100}
+.bottom-menu button{border:0;background:none;color:var(--mu);font-size:24px;padding:8px 16px;cursor:pointer;transition:all .2s}
+.bottom-menu button.on{color:var(--ac);transform:scale(1.1)}
+.notif{position:fixed;top:env(safe-area-inset-top,20px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;font-size:13px;z-index:999;animation:slide .3s ease-out;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+@keyframes slide{from{transform:translateX(-50%) translateY(-20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.search-results{max-height:240px;overflow-y:auto;margin-bottom:12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg)}
+.search-item{padding:10px 12px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .2s;display:flex;justify-content:space-between;align-items:center}
+.search-item:last-child{border-bottom:0}
+.search-item:hover{background:var(--card)}
+.search-item .name{flex:1;font-weight:500;font-size:14px}
+.search-item .meta{font-size:12px;color:var(--mu)}
+.install-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--ac);color:#fff;border:0;border-radius:10px;cursor:pointer;font-weight:500;margin-bottom:12px}
+@media (min-width:480px){main{padding-bottom:20px}.bottom-menu{display:none}.install-btn{display:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>📊 NutriTrack</h1>
+<button class="install-btn" id="installBtn" style="display:none" onclick="installApp()">
+  <span>⬇️</span>
+  <span>Instalar app</span>
+</button>
+<div class="tabs">
+  <button id="t1" onclick="setTab('hoje')">Hoje</button>
+  <button id="t2" onclick="setTab('buscar')">🔍</button>
+  <button id="t3" onclick="setTab('prog')">Progresso</button>
+  <button id="t4" onclick="setTab('cfg')">⚙️</button>
+</div>
+<div id="app"></div>
+</main>
+<div id="bottomMenu" class="bottom-menu" style="display:none">
+  <button onclick="setTab('hoje')" id="mb1">📅</button>
+  <button onclick="setTab('buscar')" id="mb2">🔍</button>
+  <button onclick="setTab('prog')" id="mb3">📈</button>
+  <button onclick="setTab('cfg')" id="mb4">⚙️</button>
+</div>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('data:application/javascript,'+encodeURIComponent(`
+self.addEventListener('install',e=>self.skipWaiting());
+self.addEventListener('activate',e=>self.clients.claim());
+self.addEventListener('fetch',e=>{
+  if(e.request.method!=='GET')return;
+  e.respondWith(caches.open('v1').then(cache=>cache.match(e.request).then(r=>r||fetch(e.request).then(res=>{cache.put(e.request,res.clone());return res}))));
+}`)).catch(e=>{});}
+let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').style.display='flex'});
+function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;document.getElementById('installBtn').style.display='none'}}
+const K='nutritrack-v3';
+let S={cfg:{cals:2200,water:2500,protein:140},days:{},w:{},foods:{}},date=iso(new Date()),tab='hoje',range=14,searchTerm='',searchResults=[],searching=false;
+function iso(d){return d.toLocaleDateString('sv-SE')}
+function addDays(s,n){const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return iso(d)}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function norm(j){return{cfg:Object.assign({cals:2200,water:2500,protein:140},j?.cfg),days:(j?.days)||{},w:(j?.w)||{},foods:(j?.foods)||{}}}
+try{const r=localStorage.getItem(K);if(r)S=norm(JSON.parse(r))}catch(e){}
+let dbDoc=null,timer;
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}clearTimeout(timer);timer=setTimeout(()=>{if(dbDoc)dbDoc.set({json:JSON.stringify(S)}).catch(()=>{})},600)}
+async function initDb(){try{const c=window.claude;if(!c)return;const[db,user]=await Promise.all([c.use('db'),c.use('user')]);if(!db||!user)return;const id=await user.id();const d=db.collection('data/users/'+id).doc('state');const s=await d.get();if(s.exists){S=norm(JSON.parse(s.data().json));try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}render()}else{await d.set({json:JSON.stringify(S)})}dbDoc=d}catch(e){}}
+initDb();
+function D(d){return S.days[d]||{f:[],e:[],w:0}}
+function W(d){if(!S.days[d])S.days[d]={f:[],e:[],w:0};return S.days[d]}
+const sum=a=>a.reduce((t,x)=>t+x.k,0);
+const sumProt=a=>a.reduce((t,x)=>t+(x.p||0),0);
+function bal(d){const x=D(d);if(!x.f.length)return null;return S.cfg.cals+sum(x.e)-sum(x.f)}
+function setTab(t){tab=t;render();if(window.innerWidth<480){document.getElementById('mb1').className=t=='hoje'?'on':'';document.getElementById('mb2').className=t=='buscar'?'on':'';document.getElementById('mb3').className=t=='prog'?'on':'';document.getElementById('mb4').className=t=='cfg'?'on':''}}
+function go(n){date=addDays(date,n);render()}
+function add(type){const n=document.getElementById(type+'n')?.value.trim()||'',k=parseFloat(document.getElementById(type+'k')?.value);if(!(k>0))return;const item={n:n||(type=='f'?'Comida':'Exercício'),k:Math.round(k)};if(type=='f'){const p=parseFloat(document.getElementById('kp')?.value)||0;item.p=Math.round(p)}W(date)[type].push(item);save();render();document.getElementById(type+'n').value='';document.getElementById(type+'k').value='';if(type=='f')document.getElementById('kp').value='';toast((type=='f'?'✅ Comida':'✅ Exercício')+' adicionado')}
+function addFromSearch(food){document.getElementById('fn').value=food.name;document.getElementById('fk').value=Math.round(food.calories||0);document.getElementById('kp').value=Math.round(food.protein||0);toast('Preenchido com '+food.name);setTab('hoje')}
+function del(type,i){W(date)[type].splice(i,1);save();render()}
+function water(ml){const x=W(date);x.w=Math.max(0,x.w+ml);save();render()}
+function waterC(){const v=parseFloat(document.getElementById('wc')?.value);if(v>0)water(Math.round(v));else if(v<0)water(Math.round(v))}
+function saveW(){const v=parseFloat(document.getElementById('kg')?.value.replace(',','.'));if(v>0){S.w[date]=v;toast('✅ Peso salvo')}else{delete S.w[date]}save();render()}
+function cfg(k,id){const v=parseFloat(document.getElementById(id)?.value);if(v>0){S.cfg[k]=v;save();render();toast('✅ Atualizado')}}
+function setRange(n){range=n;render()}
+function toast(msg){const div=document.createElement('div');div.className='notif';div.textContent=msg;document.body.appendChild(div);setTimeout(()=>{div.remove()},2000)}
+function exportData(){const json=JSON.stringify(S,null,2),blob=new Blob([json],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='nutritrack-'+iso(new Date())+'.json';a.click();URL.revokeObjectURL(url);toast('✅ Arquivo baixado')}
+function importData(){const input=document.createElement('input');input.type='file';input.accept='.json';input.onchange=e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{const data=JSON.parse(ev.target.result);S=norm(data);save();render();toast('✅ Restaurado!')}catch(e){toast('❌ Erro ao importar')}}}; input.click()}
+async function searchFoods(){const q=document.getElementById('searchInput')?.value.trim();if(!q||q.length<2)return;searching=true;render();try{const res=await fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&fields=product_name,energy_value,nutrition_grade_fr,nutriments',{headers:{'User-Agent':'NutriTrack/1.0'}});const data=await res.json();searchResults=(data.products||[]).slice(0,10).map(p=>({name:p.product_name||'?',calories:Math.round((p.nutriments?.['energy-kcal']||p.nutriments?.['energy']||0)/4.184)||0,protein:Math.round(p.nutriments?.proteins||0),source:'Open Food Facts'})).filter(x=>x.calories>0||x.protein>0);if(searchResults.length==0)toast('⚠️ Nenhum alimento encontrado');searching=false;render()}catch(e){toast('❌ Erro ao buscar');searching=false;render()}}
+function foodBlock(type,title,ph){const x=D(date)[type];const prot=type=='f'?sumProt(x):0;return `<div class="card"><h2>${title} — ${sum(x)} kcal${type=='f'?` / ${prot}g prot`:''}</h2><div class="row"><input id="${type}n" placeholder="${ph}" value="" autocomplete="off"><input id="${type}k" class="k" type="number" inputmode="numeric" placeholder="kcal">${type=='f'?`<input id="kp" type="number" inputmode="numeric" placeholder="g" class="k">`:'<div></div>'}<button class="btn" onclick="add('${type}')">+</button></div>${x.map((it,i)=>`<div class="it"><span>${esc(it.n)}</span><span class="val">${it.k} kcal${it.p?' · '+it.p+'g':''} <button onclick="del('${type}',${i})">✕</button></span></div>`).join('')}</div>`}
+function viewDay(){const x=D(date),eat=sum(x.f),ex=sum(x.e),m=S.cfg.cals,prot=sumProt(x.f),protGoal=S.cfg.protein,b=m+ex-eat,pct=Math.min(100,x.w/S.cfg.water*100);const lbl=date==iso(new Date())?'Hoje':new Date(date+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});return `<div class="nav"><button onclick="go(-1)">◀</button><b>${lbl}</b><button onclick="go(1)">▶</button></div><div class="card"><div class="macros"><div class="macro cal"><div class="label">Calorias</div><b>${eat}/${m}</b></div><div class="macro prot"><div class="label">Proteína</div><b>${prot}/${protGoal}g</b></div><div class="macro water"><div class="label">Água</div><b>${(x.w/1000).toFixed(1)}L</b></div></div><div style="margin-top:8px"><div class="bar"><i style="width:${Math.min(100,eat/m*100)}%"></i></div><div style="font-size:12px;color:var(--mu);margin-top:4px">Progresso: ${Math.round(Math.min(100,eat/m*100))}%</div></div><div class="big ${b>=0?'ok':'bad'}">${x.f.length?(b>=0?'Déficit '+b:'Superávit '+(-b))+' kcal':'Registre comida'}</div></div>${foodBlock('f','🍽️ Comida','Ex: frango com arroz')}${foodBlock('e','🏃 Exercício','Ex: corrida 30min')}<div class="card"><h2>💧 Água — ${x.w}/${S.cfg.water} ml</h2><div class="bar"><i style="width:${pct}%"></i></div><div class="chips"><button onclick="water(200)">+200</button><button onclick="water(300)">+300</button><button onclick="water(500)">+500</button><button onclick="water(-200)">−200</button></div><div class="row"><input id="wc" type="number" inputmode="numeric" placeholder="ml"><button class="btn wa" onclick="waterC()">Add</button></div></div><div class="card"><h2>⚖️ Peso</h2><div class="row"><input id="kg" inputmode="decimal" placeholder="kg" value="${S.w[date]||''}"><button class="btn" onclick="saveW()">Salvar</button></div></div>`}
+function viewSearch(){return `<div class="card"><h2>🔍 Buscar alimento</h2><p class="mu" style="margin:0 0 12px">Digite para buscar na base de dados (Open Food Facts)</p><div class="row"><input id="searchInput" placeholder="Maçã, frango, iogurte..." value="${searchTerm}" onkeyup="searchTerm=this.value" style="flex:1"><button class="btn" onclick="searchFoods()" ${searching?'disabled':''}>${searching?'...':'Buscar'}</button></div>${searchResults.length>0?`<div class="search-results">${searchResults.map((f,i)=>`<div class="search-item" onclick="addFromSearch({name:'${esc(f.name)}',calories:${f.calories},protein:${f.protein}})"><div><div class="name">${esc(f.name)}</div><div class="meta">${f.calories} kcal · ${f.protein}g prot</div></div><span style="font-size:20px">→</span></div>`).join('')}</div>`:'<p class="mu" style="margin-top:12px">Busque um alimento para começar</p>'}</div>`}
+function weightChart(dates){const pts=dates.map((d,i)=>S.w[d]?{i,v:S.w[d]}:null).filter(Boolean);if(pts.length<2)return '<p class="mu">Registre o peso em pelo menos 2 dias.</p>';const mn=Math.min(...pts.map(p=>p.v))-.3,mx=Math.max(...pts.map(p=>p.v))+.3,n=dates.length-1||1;const X=i=>12+i/n*276,Y=v=>10+(mx-v)/(mx-mn)*80;return `<svg viewBox="0 0 300 100"><polyline fill="none" stroke="var(--ac)" stroke-width="2" points="${pts.map(p=>X(p.i)+','+Y(p.v)).join(' ')}"/>${pts.map(p=>`<circle cx="${X(p.i)}" cy="${Y(p.v)}" r="3" fill="var(--ac)"/>`).join('')}<text x="2" y="98" font-size="9" fill="var(--mu)">${mn.toFixed(1)}</text><text x="2" y="9" font-size="9" fill="var(--mu)">${mx.toFixed(1)} kg</text></svg>`}
+function balChart(dates){const v=dates.map(bal),m=Math.max(500,...v.map(x=>Math.abs(x||0))),w=276/dates.length;return `<svg viewBox="0 0 300 100"><line x1="12" x2="288" y1="50" y2="50" stroke="var(--bd)"/>${v.map((x,i)=>x==null?'':`<rect x="${12+i*w+1}" width="${Math.max(1,w-2)}" y="${x>=0?50-x/m*44:50}" height="${Math.abs(x)/m*44}" fill="${x>=0?'var(--ok)':'var(--bad)'}" rx="1"/>`).join('')}</svg>`}
+function viewProg(){const dates=[];for(let i=range-1;i>=0;i--)dates.push(addDays(iso(new Date()),-i));const logged=dates.filter(d=>bal(d)!=null),tot=logged.reduce((t,d)=>t+bal(d),0),avg=logged.length?tot/logged.length:0;const wd=dates.filter(d=>S.w[d]),exp=tot/7700;let real=null;if(wd.length>=2){const a=wd[0],b=wd[wd.length-1];real=S.w[b]-S.w[a]}let verdict='Registre comida e 2+ pesagens.';if(real!=null&&logged.length>=3){verdict=`Déficit: ${Math.round(tot)} kcal (${(-exp).toFixed(2)} kg esperado). Peso: ${real>0?'+':''}${real.toFixed(2)} kg`}const wAvg=dates.map(d=>D(d).w).filter(x=>x>0),protAvg=dates.map(d=>sumProt(D(d).f)).filter(x=>x>0);return `<div class="seg">${[7,14,30,90].map(n=>`<button class="${n==range?'on':''}" onclick="setRange(${n})">${n}d</button>`).join('')}</div><div class="card"><div class="macros"><div class="macro cal"><div class="label">Dias</div><b>${logged.length}</b></div><div class="macro prot"><div class="label">Prot média</div><b>${protAvg.length?Math.round(protAvg.reduce((a,b)=>a+b,0)/protAvg.length):'–'}g</b></div><div class="macro water"><div class="label">Água média</div><b>${wAvg.length?(wAvg.reduce((a,b)=>a+b,0)/wAvg.length/1000).toFixed(1)+'L':'–'}</b></div></div><div style="margin-top:8px"><b>Déficit médio:</b><div class="big ${avg>=0?'ok':'bad'}">${Math.round(avg)} kcal/dia</div></div></div><div class="card"><h2>Análise</h2><p>${verdict}</p><p class="mu">Ref: ~7.700 kcal ≈ 1 kg</p></div><div class="card"><h2>Peso</h2>${weightChart(dates)}</div><div class="card"><h2>Balanço</h2>${balChart(dates)}</div>`}
+function viewCfg(){return `<div class="card"><h2>⚙️ Configurações</h2><label>Gasto diário base (kcal)</label><div class="row"><input id="cm" type="number" value="${S.cfg.cals}"><button class="btn g" onclick="cfg('cals','cm')">Salvar</button></div><label>Meta de proteína (g)</label><div class="row"><input id="cp" type="number" value="${S.cfg.protein}"><button class="btn g" onclick="cfg('protein','cp')">Salvar</button></div><label>Meta de água (ml)</label><div class="row"><input id="cw" type="number" value="${S.cfg.water}"><button class="btn g" onclick="cfg('water','cw')">Salvar</button></div></div><div class="card"><h2>💾 Backup</h2><div class="row"><button class="btn g" style="flex:1" onclick="exportData()">📥 Exportar</button><button class="btn g" style="flex:1" onclick="importData()">📤 Importar</button></div></div><div class="card"><h2>ℹ️ Sobre</h2><p class="mu">NutriTrack v2<br>📴 Funciona offline<br>🔍 API: Open Food Facts<br>📱 Instale como app</p></div>`}
+function render(){document.getElementById('t1').className=tab=='hoje'?'on':'';document.getElementById('t2').className=tab=='buscar'?'on':'';document.getElementById('t3').className=tab=='prog'?'on':'';document.getElementById('t4').className=tab=='cfg'?'on':'';document.getElementById('app').innerHTML=tab=='hoje'?viewDay():tab=='buscar'?viewSearch():tab=='prog'?viewProg():viewCfg();if(window.innerWidth<480)document.getElementById('bottomMenu').style.display='flex'}
+if(window.innerWidth<480)document.getElementById('bottomMenu').style.display='flex';window.addEventListener('resize',()=>{if(window.innerWidth<480)document.getElementById('bottomMenu').style.display='flex';else document.getElementById('bottomMenu').style.display='none'});
+render();
+</script>
+</body>
+</html>
